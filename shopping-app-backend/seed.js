@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 const Product = require('./models/product');
+require('dotenv').config();
+
 const products = [
   {
     name: 'Pink Lipstick and Blus',
@@ -164,8 +166,30 @@ const products = [
 ];
 
 async function seedDB() {
+  await Product.deleteMany({});
   await Product.insertMany(products);
   console.log('db seeded!');
+}
+
+if (require.main === module) {
+  const mongoUri =
+    process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/shopping-cart';
+
+  mongoose
+    .connect(mongoUri, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      useFindAndModify: false,
+      useCreateIndex: true,
+    })
+    .then(async () => {
+      await seedDB();
+      await mongoose.connection.close();
+    })
+    .catch((error) => {
+      console.log(error);
+      process.exit(1);
+    });
 }
 
 module.exports = seedDB;
