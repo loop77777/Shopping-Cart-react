@@ -6,6 +6,12 @@ const jwt = require("jsonwebtoken");
 const { isLoggedIn } = require("../middleware");
 const Product = require("../models/product");
 
+const cookieOptions = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === "production",
+  sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+};
+
 // register
 router.post("/register", async (req, res) => {
   try {
@@ -63,11 +69,7 @@ router.post("/register", async (req, res) => {
       process.env.JWT_SECRET
     );
 
-    res.cookie("token", token, {
-      httpOnly: true,
-      // secure: true,
-      // sameSite: "none",
-    });
+    res.cookie("token", token, cookieOptions);
 
     res.status(200).send("Registered Successfully");
   } catch (e) {
@@ -117,9 +119,7 @@ router.post("/login", async (req, res) => {
 
     res
       .cookie("token", token, {
-        httpOnly: true,
-        secure: true,
-        sameSite: "none",
+        ...cookieOptions,
       })
       .send("Sign In Successfully");
   } catch (e) {
@@ -132,10 +132,8 @@ router.post("/login", async (req, res) => {
 router.get("/logout", (req, res) => {
   res
     .cookie("token", "", {
-      httpOnly: true,
+      ...cookieOptions,
       expires: new Date(0),
-      secure: true,
-      sameSite: "none",
     })
     .status(200)
     .send("Logged Out SuccessFully");
