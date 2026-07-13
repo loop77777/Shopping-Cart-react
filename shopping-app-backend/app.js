@@ -9,7 +9,7 @@ const cookieParser = require("cookie-parser");
 
 const port = process.env.PORT || 3003;
 const mongoUri = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/shopping-cart";
-const clientUrl = process.env.CLIENT_URL || "http://localhost:3000";
+const clientUrl = (process.env.CLIENT_URL || "http://localhost:3000").replace(/\/$/, "");
 
 mongoose
   .connect(mongoUri, {
